@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>pxv: A pixiv API wrapper for Java</title>
+	</head>
+	<body>
+		<p>
+			<a href="http://sourceforge.jp/projects/pxv/simple/">pxv</a> は，
+			イラストコミュニケーションサービス <a href="http://www.pixiv.net/">pixiv</a> の API を Java から利用するためのライブラリです．
+		</p>
+		<h2>必須環境</h2>
+		<ul>
+			<li>Java SE 6 以降</li>
+		</ul>
+		<h2>サンプルコード</h2>
+		<blockquote><pre>
+final PixivAPI api = new PixivAPI();
+
+// システムの稼働状態を調べます．
+System.out.println("Status: " + api.status());
+
+// 最新 10件を取得しタイトル，作者，画像 URL を表示します．
+System.out.println("= 10 new images =");
+for(final Image i : api.getNewImages(10)){
+
+	System.out.println(String.format("%s by %s (%s)", i.getTitle(), i.getAuthorName(), i.getImageURL()));
+
+}
+
+// ログインしユーザ別の情報を取得します．
+if(api.login("user_id", "password")){
+
+	System.out.println("Profile: " + api.profile());
+	System.out.println("My pixiv new images: " + api.getMyPixivNewImageSize());
+
+}
+		</pre></blockquote>
+
+	</body>
+</html>
