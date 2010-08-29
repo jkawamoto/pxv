@@ -64,6 +64,11 @@ public class PixivAPI {
 	//============================================================================
 	//  Constructors
 	//============================================================================
+	/**
+	 * PixivAPI インスタンスを作成する．
+	 *
+	 * @throws IOException I/O エラーが発生した場合．
+	 */
 	public PixivAPI() throws IOException{
 
 		this.base = new URL(BaseURL);
@@ -238,6 +243,73 @@ public class PixivAPI {
 
 	public List<User> findUsers(final String name, final int size) throws IOException{
 		return this.getUsers(SearchUser, String.format("nick=%s", URLEncoder.encode(name , UTF8)), size);
+	}
+
+	public User findUser(final int id, final String name){
+
+		final List<User> ret = new ArrayList<User>();
+		try{
+
+			for(int i = 0; ret.size() == 0 && i < 100; ++i){
+
+				final URL url = new URL(this.base, String.format("%s.php?nick=%s&%s=%s&p=%d", SearchUser, URLEncoder.encode(name, UTF8), SessionID, this.session, i));
+				final HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				con.connect();
+
+				if(con.getResponseCode() == 200){
+
+					final Reader in = new InputStreamReader(con.getInputStream());
+					CSVParser.parse(in, new Handler(){
+
+						@Override
+						public void update(final String[] data) {
+
+							try {
+
+								final User u = new User(PixivAPI.this, data);
+								if(u.getId() == id){
+
+									ret.add(u);
+
+								}
+
+							} catch (IOException e) {
+
+								// TODO 自動生成された catch ブロック
+								e.printStackTrace();
+
+							}
+
+						}
+
+					});
+					in.close();
+
+				}else{
+
+					break;
+
+				}
+
+			}
+
+		}catch(final IOException e){
+
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+
+		}
+
+		if(ret.size() != 0){
+
+			return ret.get(0);
+
+		}else{
+
+			return null;
+
+		}
+
 	}
 
 	//----------------------------------------------------------------------------
@@ -517,7 +589,6 @@ public class PixivAPI {
 			System.out.println("My pixiv new images: " + api.getMyPixivNewImageSize());
 
 		}
-
 
 	}
 

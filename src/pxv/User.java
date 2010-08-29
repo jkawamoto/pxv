@@ -103,6 +103,12 @@ public class User {
 		return this.api.getImageSize(this);
 	}
 
+	/**
+	 * このユーザの投稿画像を指定した数だけ取得する．
+	 *
+	 * @param size 取得する画像数
+	 * @return 取得した画像のリスト
+	 */
 	public List<Image> getImages(final int size){
 		return this.api.getImages(this, size);
 	}

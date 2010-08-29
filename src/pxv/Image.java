@@ -87,7 +87,7 @@ public class Image {
 
 	}
 
-	public int getID(){
+	public int getId(){
 		return this.id;
 	}
 
@@ -157,30 +157,28 @@ public class Image {
 
 	//----------------------------------------------------------------------------
 	public User getAuthor(){
-		return this.getAuthor(50);
+		return this.api.findUser(this.getAuthorId(), this.getAuthorName());
 	}
 
-	public User getAuthor(final int depth){
+	//----------------------------------------------------------------------------
+	@Override
+	public String toString(){
 
-		try {
+		final StringBuilder ret = new StringBuilder();
+		ret.append(this.getClass().getName());
+		ret.append("[id: ");
+		ret.append(this.getId());
+		ret.append(", title: ");
+		ret.append(this.getTitle());
+		ret.append(", author name: ");
+		ret.append(this.getAuthorName());
+		ret.append(", data: ");
+		ret.append(this.getDate());
+		ret.append("]");
 
-			for(final User u : this.api.findUsers(this.getAuthorName(), depth)){
-
-				if(u.getId() == this.getAuthorId()){
-
-					return u;
-
-				}
-
-			}
-
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-
-		return null;
+		return ret.toString();
 
 	}
+
 
 }
