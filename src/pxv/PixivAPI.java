@@ -33,11 +33,16 @@ import java.util.regex.Pattern;
 
 import pxv.CSVParser.Handler;
 
+/**
+ * Pixiv API．
+ *
+ * @since 0.1
+ */
 public class PixivAPI {
 
 	private final URL base;
 
-	private String session = null;
+	private String session = Zero;
 
 	//============================================================================
 	//  Constants
@@ -45,12 +50,9 @@ public class PixivAPI {
 	private static final String BaseURL = "http://iphone.pxv.jp/iphone/";
 	private static final String SessionID = "PHPSESSID";
 
-	private static final String NewImages = "new_illust";
-	private static final String MyPixivNewImages = "mypixiv_new_illust";
-	private static final String BookmarkedUserNewImages = "bookmark_user_new_illust";
-	private static final String Ranking = "ranking";
-	private static final String Search = "search";
-	private static final String SearchUser = "search_user";
+	private enum Type{
+		new_illust, mypixiv_new_illust, bookmark_user_new_illust, ranking, search, search_user, bookmark, bookmark_user_all, mypixiv_all, member_illust
+	}
 
 	private static final String DummyParameter = "dummy=0";
 	private static final String Daily = "mode=day";
@@ -60,6 +62,7 @@ public class PixivAPI {
 	private static final String IDParamTemplate = "id=%d";
 
 	private static final String UTF8 = "UTF-8";
+	private static final String Zero = "0";
 
 	//============================================================================
 	//  Constructors
@@ -122,10 +125,15 @@ public class PixivAPI {
 	 */
 	public boolean logined(){
 
-		return this.session != null;
+		return this.session != Zero;
 
 	}
 
+	/**
+	 * システムの稼働状態を調べる．
+	 *
+	 * @return システムが稼働している場合 true
+	 */
 	public boolean status(){
 
 		try {
@@ -146,6 +154,11 @@ public class PixivAPI {
 
 	}
 
+	/**
+	 * ログインユーザのプロフィールを取得する．
+	 *
+	 * @return プロフィール
+	 */
 	public String profile(){
 
 		final StringBuffer ret = new StringBuffer();
@@ -182,51 +195,51 @@ public class PixivAPI {
 	//  APIs for new images
 	//----------------------------------------------------------------------------
 	public int getNewImageSize(){
-		return this.getSize(NewImages, DummyParameter);
+		return this.getSize(Type.new_illust, DummyParameter);
 	}
 
-	public List<Image> getNewImages(final int size){
-		return this.getImages(NewImages, DummyParameter, size);
+	public List<Image> getNewImages(final int page){
+		return this.getImages(Type.new_illust, DummyParameter, page);
 	}
 
 	public int getMyPixivNewImageSize(){
-		return this.getSize(MyPixivNewImages, DummyParameter);
+		return this.getSize(Type.mypixiv_new_illust, DummyParameter);
 	}
 
-	public List<Image> getMyPixivNewImages(final int size){
-		return this.getImages(MyPixivNewImages, DummyParameter, size);
+	public List<Image> getMyPixivNewImages(final int page){
+		return this.getImages(Type.mypixiv_new_illust, DummyParameter, page);
 	}
 
 	public int getBookmarkedUserNewImageSize(){
-		return this.getSize(BookmarkedUserNewImages, DummyParameter);
+		return this.getSize(Type.bookmark_user_new_illust, DummyParameter);
 	}
 
-	public List<Image> getBookmarkedUserNewImages(final int size){
-		return this.getImages(BookmarkedUserNewImages, DummyParameter, size);
+	public List<Image> getBookmarkedUserNewImages(final int page){
+		return this.getImages(Type.bookmark_user_new_illust, DummyParameter, page);
 	}
 
 	public int getDailyRankingImageSize(){
-		return this.getSize(Ranking, Daily);
+		return this.getSize(Type.ranking, Daily);
 	}
 
-	public List<Image> getDailyRankingImages(final int size){
-		return this.getImages(Ranking, Daily, size);
+	public List<Image> getDailyRankingImages(final int page){
+		return this.getImages(Type.ranking, Daily, page);
 	}
 
 	public int getWeeklyRankingImageSize(){
-		return this.getSize(Ranking, Weekly);
+		return this.getSize(Type.ranking, Weekly);
 	}
 
-	public List<Image> getWeeklyRankingImages(final int size){
-		return this.getImages(Ranking, Weekly, size);
+	public List<Image> getWeeklyRankingImages(final int page){
+		return this.getImages(Type.ranking, Weekly, page);
 	}
 
 	public int getMonthlyRankingImageSize(){
-		return this.getSize(Ranking, Monthly);
+		return this.getSize(Type.ranking, Monthly);
 	}
 
-	public List<Image> getMonthlyRankingImages(final int size){
-		return this.getImages(Ranking, Monthly, size);
+	public List<Image> getMonthlyRankingImages(final int page){
+		return this.getImages(Type.ranking, Monthly, page);
 	}
 
 
@@ -234,15 +247,37 @@ public class PixivAPI {
 	//  APIs for search
 	//----------------------------------------------------------------------------
 	public List<Image> findImagesByTag(final String keyword, final int size) throws IOException{
-		return this.getImages(Search, String.format("s_mode=s_tag&word=%s", URLEncoder.encode(keyword , UTF8)), size);
+
+		final String param = String.format("s_mode=s_tag&word=%s", URLEncoder.encode(keyword , UTF8));
+		return this.findImages(param, size);
 	}
 
 	public List<Image> findImagesByTitle(final String keyword, final int size) throws IOException{
-		return this.getImages(Search, String.format("s_mode=s_tc&word=%s", URLEncoder.encode(keyword , UTF8)), size);
+
+		final String param = String.format("s_mode=s_tc&word=%s", URLEncoder.encode(keyword , UTF8));
+		return this.findImages(param, size);
+
 	}
 
 	public List<User> findUsers(final String name, final int size) throws IOException{
-		return this.getUsers(SearchUser, String.format("nick=%s", URLEncoder.encode(name , UTF8)), size);
+
+		final List<User> ret = new ArrayList<User>();
+		final String param = String.format("nick=%s", URLEncoder.encode(name , UTF8));
+		for(int i = 0; true; ++i){
+
+			final List<User> sub = this.getUsers(Type.search, param, i);
+			if(sub.size() == 0){
+
+				break;
+
+			}
+
+			ret.addAll(sub);
+
+		}
+
+		return ret;
+
 	}
 
 	public User findUser(final int id, final String name){
@@ -252,7 +287,7 @@ public class PixivAPI {
 
 			for(int i = 0; ret.size() == 0 && i < 100; ++i){
 
-				final URL url = new URL(this.base, String.format("%s.php?nick=%s&%s=%s&p=%d", SearchUser, URLEncoder.encode(name, UTF8), SessionID, this.session, i));
+				final URL url = new URL(this.base, String.format("%s.php?nick=%s&%s=%s&p=%d", Type.search_user, URLEncoder.encode(name, UTF8), SessionID, this.session, i));
 				final HttpURLConnection con = (HttpURLConnection) url.openConnection();
 				con.connect();
 
@@ -316,67 +351,67 @@ public class PixivAPI {
 	//  APIs for user
 	//----------------------------------------------------------------------------
 	public int getImageSize(final int userId){
-		return this.getSizeById("member_illust", userId);
+		return this.getSizeById(Type.member_illust, userId);
 	}
 
 	public int getImageSize(final User user){
 		return this.getImageSize(user.getId());
 	}
 
-	public List<Image> getImages(final int userId, final int size){
-		return this.getImagesById("member_illust", userId, size);
+	public List<Image> getImages(final int userId, final int page){
+		return this.getImagesByUserId(Type.member_illust, userId, page);
 	}
 
-	public List<Image> getImages(final User user, final int size){
-		return this.getImages(user.getId(), size);
+	public List<Image> getImages(final User user, final int page){
+		return this.getImages(user.getId(), page);
 	}
 
 	public int getMyPixivSize(final int usrId){
-		return this.getSizeById("mypixiv_all", usrId);
+		return this.getSizeById(Type.mypixiv_all, usrId);
 	}
 
 	public int getMyPixivSize(final User user){
 		return this.getMyPixivSize(user.getId());
 	}
 
-	public List<User> getMyPixivUsers(final int usrId, final int size){
-		return this.getUsersById("mypixiv_all", usrId, size);
+	public List<User> getMyPixivUsers(final int usrId, final int page){
+		return this.getUsersById(Type.mypixiv_all, usrId, page);
 	}
 
-	public List<User> getMyPixivUsers(final User user, final int size){
-		return this.getMyPixivUsers(user.getId(), size);
+	public List<User> getMyPixivUsers(final User user, final int page){
+		return this.getMyPixivUsers(user.getId(), page);
 	}
 
 	public int getBookmarkedUserSize(final int id){
-		return this.getSizeById("bookmark_user_all", id);
+		return this.getSizeById(Type.bookmark_user_all, id);
 	}
 
 	public int getBookmarkedUserSize(final User user){
 		return this.getBookmarkedUserSize(user.getId());
 	}
 
-	public List<User> getBookmarkedUsers(final int id, final int size){
-		return this.getUsersById("bookmark_user_all", id, size);
+	public List<User> getBookmarkedUsers(final int id, final int page){
+		return this.getUsersById(Type.bookmark_user_all, id, page);
 	}
 
-	public List<User> getBookmarkedUsers(final User user, final int size){
-		return this.getBookmarkedUsers(user.getId(), size);
+	public List<User> getBookmarkedUsers(final User user, final int page){
+		return this.getBookmarkedUsers(user.getId(), page);
 	}
 
 	public int getBookmarkSize(final int id){
-		return this.getSizeById("bookmark", id);
+		return this.getSizeById(Type.bookmark, id);
 	}
 
 	public int getBookmarkSize(final User user){
 		return this.getBookmarkSize(user.getId());
 	}
 
-	public List<Image> getBookmarks(final int id, final int size){
-		return this.getImagesById("bookmark", id, size);
+	public List<Image> getBookmarks(final int id, final int page){
+		return this.getImagesByUserId(Type.bookmark, id, page);
 	}
 
-	public List<Image> getBookmarks(final User user, final int size){
-		return this.getBookmarks(user.getId(), size);
+	public List<Image> getBookmarks(final User user, final int page){
+		return this.getBookmarks(user.getId(), page);
 	}
 
 
@@ -402,7 +437,14 @@ public class PixivAPI {
 
 	}
 
-	private int getSize(final String type, final String param){
+	/**
+	 * ユーザまたは画像の総数を取得する．
+	 *
+	 * @param type 取得する総数の種類
+	 * @param param 問合せ用パラメータ
+	 * @return 取得したユーザまたは画像の総数
+	 */
+	private int getSize(final Type type, final String param){
 
 		int ret = -1;
 		try{
@@ -435,56 +477,61 @@ public class PixivAPI {
 
 	}
 
-	private int getSizeById(final String type, final int id){
+	/**
+	 * ID を指定してユーザまたは画像の総数を取得する．
+	 *
+	 * @param type 取得する総数の種類
+	 * @param id 問合せに使用する ID
+	 * @return 取得したユーザまたは画像の総数
+	 */
+	private int getSizeById(final Type type, final int id){
 		return this.getSize(type, String.format(IDParamTemplate, id));
 	}
 
-	private List<Image> getImages(final String type, final String param, final int size){
+	/**
+	 * 画像に関する情報を取得する．
+	 *
+	 * @param type 取得する画像の種類
+	 * @param param 問合せ用パラメータ
+	 * @param page 取得するページ
+	 * @return 取得した画像のリスト
+	 */
+	private List<Image> getImages(final Type type, final String param, final int page){
 
 		final List<Image> ret = new ArrayList<Image>();
 		try{
 
-			for(int i = 0; ret.size() < size; ++i){
+			final URL url = new URL(this.base, String.format("%s.php?%s&%s=%s&p=%d", type, param, SessionID, this.session, page));
+			final HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.connect();
 
-				final int current = ret.size();
-				final URL url = new URL(this.base, String.format("%s.php?%s&%s=%s&p=%d", type, param, SessionID, this.session, i));
-				final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-				con.connect();
+			if(con.getResponseCode() == 200){
 
-				if(con.getResponseCode() == 200){
+				final Reader in = new InputStreamReader(con.getInputStream());
+				CSVParser.parse(in, new Handler(){
 
-					final Reader in = new InputStreamReader(con.getInputStream());
-					CSVParser.parse(in, new Handler(){
+					@Override
+					public void update(final String[] data) {
 
-						@Override
-						public void update(final String[] data) {
+						try {
 
-							if(ret.size() < size){
+							final Image image = new Image(PixivAPI.this, data);
+							if(!ret.contains(image)){
 
-								try {
-
-									ret.add(new Image(PixivAPI.this, data));
-
-								} catch (IOException e) {
-									// TODO 自動生成された catch ブロック
-									e.printStackTrace();
-
-								}
+								ret.add(image);
 
 							}
 
+						} catch (IOException e) {
+
+							e.printStackTrace();
+
 						}
 
-					});
-					in.close();
+					}
 
-				}
-
-				if(current == ret.size()){
-
-					break;
-
-				}
+				});
+				in.close();
 
 			}
 
@@ -498,60 +545,66 @@ public class PixivAPI {
 
 	}
 
-	private List<Image> getImagesById(final String type, final int id, final int size){
-		return this.getImages(type, String.format(IDParamTemplate, id), size);
+	private List<Image> getImagesByUserId(final Type type, final int id, final int page){
+		return this.getImages(type, String.format(IDParamTemplate, id), page);
 	}
 
-	private List<User> getUsers(final String type, final String param, final int size){
+	private List<Image> findImages(final String param, final int size) throws IOException{
+
+		final List<Image> ret = new ArrayList<Image>();
+		for(int i = 0; ret.size() < size; ++i){
+
+			final List<Image> sub = this.getImages(Type.search, param, i);
+			if(sub.size() == 0){
+
+				break;
+
+			}
+
+			ret.addAll(sub);
+
+		}
+
+
+		return ret;
+
+	}
+
+	private List<User> getUsers(final Type type, final String param, final int page){
 
 		final List<User> ret = new ArrayList<User>();
 		try{
 
-			for(int i = 0; ret.size() < size; ++i){
+			final URL url = new URL(this.base, String.format("%s.php?%s&%s=%s&p=%d", type, param, SessionID, this.session, page));
+			final HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.connect();
 
-				final int current = ret.size();
+			if(con.getResponseCode() == 200){
 
-				final URL url = new URL(this.base, String.format("%s.php?%s&%s=%s&p=%d", type, param, SessionID, this.session, i));
-				final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-				con.connect();
+				final Reader in = new InputStreamReader(con.getInputStream());
+				CSVParser.parse(in, new Handler(){
 
-				if(con.getResponseCode() == 200){
+					@Override
+					public void update(final String[] data) {
 
-					final Reader in = new InputStreamReader(con.getInputStream());
-					CSVParser.parse(in, new Handler(){
+						try {
 
-						@Override
-						public void update(final String[] data) {
+							ret.add(new User(PixivAPI.this, data));
 
-							if(ret.size() < size){
+						} catch (IOException e) {
 
-								try {
-
-									ret.add(new User(PixivAPI.this, data));
-
-								} catch (IOException e) {
-
-									// TODO 自動生成された catch ブロック
-									e.printStackTrace();
-
-								}
-
-							}
+							// TODO 自動生成された catch ブロック
+							e.printStackTrace();
 
 						}
 
-					});
-					in.close();
+					}
 
-				}
-
-				if(current == ret.size()){
-
-					break;
-
-				}
+				});
+				in.close();
 
 			}
+
 
 		}catch(final IOException e){
 
@@ -563,20 +616,44 @@ public class PixivAPI {
 
 	}
 
-	private List<User> getUsersById(final String type, final int id, final int size){
-		return this.getUsers(type, String.format(IDParamTemplate, id), size);
+	private List<User> getUsersById(final Type type, final int id, final int page){
+		return this.getUsers(type, String.format(IDParamTemplate, id), page);
 	}
 
 	//============================================================================
 	//  Public static methods
 	//============================================================================
+	/**
+	 * サンプルプログラム．
+	 *
+	 * @param args ユーザ名，パスワード，タグ検索用キーワード
+	 * @throws IOException IOエラーが発生した場合．
+	 */
 	public static void main(final String[] args) throws IOException{
 
 		final PixivAPI api = new PixivAPI();
 		System.out.println("Status: " + api.status());
 
-		System.out.println("= 10 new images");
-		for(final Image i : api.getNewImages(10)){
+		System.out.println("= new images on the 1st page");
+		for(final Image i : api.getNewImages(0)){
+
+			System.out.println(String.format("%s by %s (%s)", i.getTitle(), i.getAuthorName(), i.getImageURL()));
+
+			final User author = i.getAuthor();
+			if(author != null){
+
+				for(final User user : author.getBookmarkedUsers(0)){
+
+					System.out.println(">> " + user);
+
+				}
+
+			}
+
+		}
+
+		System.out.println("= find images by tag");
+		for(final Image i : api.findImagesByTag(args[2], 10)){
 
 			System.out.println(String.format("%s by %s (%s)", i.getTitle(), i.getAuthorName(), i.getImageURL()));
 

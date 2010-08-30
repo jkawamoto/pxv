@@ -21,6 +21,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * Pixiv におけるユーザデータをラップするクラス．
+ *
+ * @since 0.1
+ */
 public class User {
 
 	/** 親オブジェクト */
@@ -104,13 +109,13 @@ public class User {
 	}
 
 	/**
-	 * このユーザの投稿画像を指定した数だけ取得する．
+	 * このユーザの投稿画像を取得する．
 	 *
-	 * @param size 取得する画像数
+	 * @param page 取得する画像のページ
 	 * @return 取得した画像のリスト
 	 */
-	public List<Image> getImages(final int size){
-		return this.api.getImages(this, size);
+	public List<Image> getImages(final int page){
+		return this.api.getImages(this, page);
 	}
 
 	/**
@@ -122,24 +127,52 @@ public class User {
 		return this.api.getMyPixivSize(this);
 	}
 
-	public List<User> getMyPixivUsers(final int size){
-		return this.api.getMyPixivUsers(this, size);
+	/**
+	 * MyPixiv ユーザを取得する．
+	 *
+	 * @param page 取得するページ
+	 * @return 取得したユーザのリスト
+	 */
+	public List<User> getMyPixivUsers(final int page){
+		return this.api.getMyPixivUsers(this, page);
 	}
 
+	/**
+	 * お気に入りユーザ数を取得する．
+	 *
+	 * @return このユーザのお気に入りユーザ数
+	 */
 	public int getBookmarkedUserSize(){
 		return this.api.getBookmarkedUserSize(this);
 	}
 
-	public List<User> getBookmarkedUsers(final int size){
-		return this.api.getBookmarkedUsers(this, size);
+	/**
+	 * お気に入りユーザを取得する．
+	 *
+	 * @param page 取得するページ
+	 * @return 取得したユーザのリスト
+	 */
+	public List<User> getBookmarkedUsers(final int page){
+		return this.api.getBookmarkedUsers(this, page);
 	}
 
+	/**
+	 * ブックマークイラストの数を取得する．
+	 *
+	 * @return ブックマークしたイラストの数
+	 */
 	public int getBookmarkSize(){
 		return this.api.getBookmarkSize(this);
 	}
 
-	public List<Image> getBookmarks(final int size){
-		return this.api.getBookmarks(this, size);
+	/**
+	 * ブックマークイラストを取得する．
+	 *
+	 * @param page 取得するページ数
+	 * @return 取得したイラストのリスト
+	 */
+	public List<Image> getBookmarks(final int page){
+		return this.api.getBookmarks(this, page);
 	}
 
 	//----------------------------------------------------------------------------
@@ -164,6 +197,30 @@ public class User {
 
 		return ret.toString();
 
+	}
+
+	/* (非 Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return Integer.valueOf(this.getId()).hashCode();
+	}
+
+	/* (非 Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+
+		if(obj instanceof User){
+
+			final User that = (User)obj;
+			return this.getId() == that.getId();
+
+		}
+
+		return super.equals(obj);
 	}
 
 }
