@@ -18,19 +18,39 @@
 		<blockquote><pre>
 final PixivAPI api = new PixivAPI();
 
-// システムの稼働状態を調べます．
+// システムの稼働状態を調べる．
 System.out.println("Status: " + api.status());
 
-// 最新 10件を取得しタイトル，作者，画像 URL を表示します．
-System.out.println("= 10 new images =");
-for(final Image i : api.getNewImages(10)){
+// 最新投稿イラスト（1 ページ目）を列挙する．
+for(final Image i : api.getNewImages(0)){
+
+	// イラストのタイトル，作者，URL を表示．
+	System.out.println(String.format("%s by %s (%s)", i.getTitle(), i.getAuthorName(), i.getImageURL()));
+
+	// イラストの作者を取得．
+	final User author = i.getAuthor();
+	if(author != null){
+
+		// ユーザのお気に入りユーザ（1 ページ目) を列挙．
+		for(final User u : author.getBookmarkedUsers(0)){
+
+			System.out.println(">> " + u);
+
+		}
+
+	}
+
+}
+
+// タグを検索（トップ 10 件）．
+for(final Image i : api.findImagesByTag("tag keyword", 10)){
 
 	System.out.println(String.format("%s by %s (%s)", i.getTitle(), i.getAuthorName(), i.getImageURL()));
 
 }
 
-// ログインしユーザ別の情報を取得します．
-if(api.login("user_id", "password")){
+// ログインしユーザ別の情報を取得．
+if(api.login(args[0], args[1])){
 
 	System.out.println("Profile: " + api.profile());
 	System.out.println("My pixiv new images: " + api.getMyPixivNewImageSize());
