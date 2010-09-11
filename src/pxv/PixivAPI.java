@@ -194,50 +194,118 @@ public class PixivAPI {
 	//----------------------------------------------------------------------------
 	//  APIs for new images
 	//----------------------------------------------------------------------------
+	/**
+	 * 新着イラスト数を取得する．
+	 *
+	 * @return 新着イラスト数
+	 */
 	public int getNewImageSize(){
 		return this.getSize(Type.new_illust, DummyParameter);
 	}
 
+	/**
+	 * 新着イラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getNewImages(final int page){
 		return this.getImages(Type.new_illust, DummyParameter, page);
 	}
 
+	/**
+	 * 新着 MyPixiv イラストの数を取得する．
+	 *
+	 * @return 新着 MyPixiv イラスト数
+	 */
 	public int getMyPixivNewImageSize(){
 		return this.getSize(Type.mypixiv_new_illust, DummyParameter);
 	}
 
+	/**
+	 * 新着 MyPixiv イラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getMyPixivNewImages(final int page){
 		return this.getImages(Type.mypixiv_new_illust, DummyParameter, page);
 	}
 
+	/**
+	 * お気に入りユーザの新着イラスト数を取得する．
+	 *
+	 * @return お気に入りユーザの新着イラスト数
+	 */
 	public int getBookmarkedUserNewImageSize(){
 		return this.getSize(Type.bookmark_user_new_illust, DummyParameter);
 	}
 
+	/**
+	 * お気に入りユーザの新着イラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getBookmarkedUserNewImages(final int page){
 		return this.getImages(Type.bookmark_user_new_illust, DummyParameter, page);
 	}
 
+	//----------------------------------------------------------------------------
+
+	/**
+	 * デイリーランキングのイラスト数を取得する．
+	 *
+	 * @return デイリーランキングのイラスト数
+	 */
 	public int getDailyRankingImageSize(){
 		return this.getSize(Type.ranking, Daily);
 	}
 
+	/**
+	 * デイリーランキングのイラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getDailyRankingImages(final int page){
 		return this.getImages(Type.ranking, Daily, page);
 	}
 
+	/**
+	 * ウィークリーランキングのイラスト数を取得する．
+	 *
+	 * @return ウィークリーランキングのイラスト数
+	 */
 	public int getWeeklyRankingImageSize(){
 		return this.getSize(Type.ranking, Weekly);
 	}
 
+	/**
+	 * ウィークリーランキングのイラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getWeeklyRankingImages(final int page){
 		return this.getImages(Type.ranking, Weekly, page);
 	}
 
+	/**
+	 * マンスリーランキングのイラスト数を取得する．
+	 *
+	 * @return マンスリーランキングのイラスト数
+	 */
 	public int getMonthlyRankingImageSize(){
 		return this.getSize(Type.ranking, Monthly);
 	}
 
+	/**
+	 * マンスリーランキングのイラストを取得する．
+	 *
+	 * @param page 取得するページ番号
+	 * @return 取得したイラストのリスト
+	 */
 	public List<Image> getMonthlyRankingImages(final int page){
 		return this.getImages(Type.ranking, Monthly, page);
 	}
@@ -246,12 +314,28 @@ public class PixivAPI {
 	//----------------------------------------------------------------------------
 	//  APIs for search
 	//----------------------------------------------------------------------------
+	/**
+	 * 与えられたキーワードに関連するタグを付加されたイラストを取得する．
+	 *
+	 * @param keyword 問い合わせるキーワード
+	 * @param size 取得するイラスト数
+	 * @return 取得したイラストのリスト
+	 * @throws IOException IOエラーが発生した場合
+	 */
 	public List<Image> findImagesByTag(final String keyword, final int size) throws IOException{
 
 		final String param = String.format("s_mode=s_tag&word=%s", URLEncoder.encode(keyword , UTF8));
 		return this.findImages(param, size);
 	}
 
+	/**
+	 * 与えられたキーワードに関連するタイトルを持つイラストを取得する．
+	 *
+	 * @param keyword 問い合わせるキーワード
+	 * @param size 取得するイラスト数
+	 * @return 取得したイラストのリスト
+	 * @throws IOException IOエラーが発生した場合
+	 */
 	public List<Image> findImagesByTitle(final String keyword, final int size) throws IOException{
 
 		final String param = String.format("s_mode=s_tc&word=%s", URLEncoder.encode(keyword , UTF8));
@@ -259,6 +343,14 @@ public class PixivAPI {
 
 	}
 
+	/**
+	 * 与えられた名前のユーザを取得する．
+	 *
+	 * @param name 問い合わせるユーザの名前
+	 * @param size 取得するユーザ数
+	 * @return 取得したユーザのリスト
+	 * @throws IOException IOエラーが発生した場合
+	 */
 	public List<User> findUsers(final String name, final int size) throws IOException{
 
 		final List<User> ret = new ArrayList<User>();
@@ -280,6 +372,13 @@ public class PixivAPI {
 
 	}
 
+	/**
+	 * ID と名前を指定してユーザを取得する．
+	 *
+	 * @param id 取得するユーザの ID
+	 * @param name 取得するユーザの名前
+	 * @return 取得したユーザの User オブジェクト，ユーザが見つからなかった場合は null
+	 */
 	public User findUser(final int id, final String name){
 
 		final List<User> ret = new ArrayList<User>();
@@ -350,70 +449,89 @@ public class PixivAPI {
 	//----------------------------------------------------------------------------
 	//  APIs for user
 	//----------------------------------------------------------------------------
+	/**
+	 * 指定したユーザの投稿イラスト数を取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @return 指定したユーザ ID を持つユーザの投稿イラスト数
+	 */
 	public int getImageSize(final int userId){
 		return this.getSizeById(Type.member_illust, userId);
 	}
 
-	public int getImageSize(final User user){
-		return this.getImageSize(user.getId());
-	}
-
+	/**
+	 * 指定したユーザの投稿イラストを取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @param page ページ数
+	 * @return 指定したユーザ ID を持つユーザの投稿イラスト
+	 */
 	public List<Image> getImages(final int userId, final int page){
 		return this.getImagesByUserId(Type.member_illust, userId, page);
 	}
 
-	public List<Image> getImages(final User user, final int page){
-		return this.getImages(user.getId(), page);
-	}
-
+	/**
+	 * 指定したユーザの MyPixiv ユーザ数を取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @return 指定したユーザ ID を持つユーザの MyPixiv ユーザ数
+	 */
 	public int getMyPixivSize(final int usrId){
 		return this.getSizeById(Type.mypixiv_all, usrId);
 	}
 
-	public int getMyPixivSize(final User user){
-		return this.getMyPixivSize(user.getId());
-	}
-
+	/**
+	 * 指定したユーザの MyPixiv ユーザを取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @param page ページ数
+	 * @return 指定したユーザ ID を持つユーザの MyPixiv ユーザ
+	 */
 	public List<User> getMyPixivUsers(final int usrId, final int page){
 		return this.getUsersById(Type.mypixiv_all, usrId, page);
 	}
 
-	public List<User> getMyPixivUsers(final User user, final int page){
-		return this.getMyPixivUsers(user.getId(), page);
-	}
-
+	/**
+	 * 指定したユーザのお気に入りユーザ数を取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @return 指定したユーザ ID を持つユーザのお気に入りユーザ数
+	 */
 	public int getBookmarkedUserSize(final int id){
 		return this.getSizeById(Type.bookmark_user_all, id);
 	}
 
-	public int getBookmarkedUserSize(final User user){
-		return this.getBookmarkedUserSize(user.getId());
-	}
-
+	/**
+	 * 指定したユーザのお気に入りユーザを取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @param page ページ数
+	 * @return 指定したユーザ ID を持つユーザのお気に入りユーザ
+	 */
 	public List<User> getBookmarkedUsers(final int id, final int page){
 		return this.getUsersById(Type.bookmark_user_all, id, page);
 	}
 
-	public List<User> getBookmarkedUsers(final User user, final int page){
-		return this.getBookmarkedUsers(user.getId(), page);
-	}
-
+	/**
+	 * 指定したユーザのブックマーク数を取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @return 指定したユーザ ID を持つユーザのブックマーク数
+	 */
 	public int getBookmarkSize(final int id){
 		return this.getSizeById(Type.bookmark, id);
 	}
 
-	public int getBookmarkSize(final User user){
-		return this.getBookmarkSize(user.getId());
-	}
-
+	/**
+	 * 指定したユーザのブックマークを取得する．
+	 *
+	 * @param userId ユーザ ID
+	 * @param page ページ数
+	 * @return 指定したユーザ ID を持つユーザのブックマーク
+	 */
 	public List<Image> getBookmarks(final int id, final int page){
 		return this.getImagesByUserId(Type.bookmark, id, page);
 	}
-
-	public List<Image> getBookmarks(final User user, final int page){
-		return this.getBookmarks(user.getId(), page);
-	}
-
 
 	//============================================================================
 	//  Private methods

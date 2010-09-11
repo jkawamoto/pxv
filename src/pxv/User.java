@@ -97,15 +97,14 @@ public class User {
 	}
 
 	//----------------------------------------------------------------------------
-	//
-	//----------------------------------------------------------------------------
+
 	/**
 	 * このユーザの投稿画像数を取得する．
 	 *
 	 * @return 投稿画像総数
 	 */
 	public int getImageSize(){
-		return this.api.getImageSize(this);
+		return this.api.getImageSize(this.getId());
 	}
 
 	/**
@@ -115,7 +114,7 @@ public class User {
 	 * @return 取得した画像のリスト
 	 */
 	public List<Image> getImages(final int page){
-		return this.api.getImages(this, page);
+		return this.api.getImages(this.getId(), page);
 	}
 
 	/**
@@ -124,7 +123,7 @@ public class User {
 	 * @return
 	 */
 	public int getMyPixivSize(){
-		return this.api.getMyPixivSize(this);
+		return this.api.getMyPixivSize(this.getId());
 	}
 
 	/**
@@ -134,7 +133,7 @@ public class User {
 	 * @return 取得したユーザのリスト
 	 */
 	public List<User> getMyPixivUsers(final int page){
-		return this.api.getMyPixivUsers(this, page);
+		return this.api.getMyPixivUsers(this.getId(), page);
 	}
 
 	/**
@@ -143,7 +142,7 @@ public class User {
 	 * @return このユーザのお気に入りユーザ数
 	 */
 	public int getBookmarkedUserSize(){
-		return this.api.getBookmarkedUserSize(this);
+		return this.api.getBookmarkedUserSize(this.getId());
 	}
 
 	/**
@@ -153,7 +152,7 @@ public class User {
 	 * @return 取得したユーザのリスト
 	 */
 	public List<User> getBookmarkedUsers(final int page){
-		return this.api.getBookmarkedUsers(this, page);
+		return this.api.getBookmarkedUsers(this.getId(), page);
 	}
 
 	/**
@@ -162,7 +161,7 @@ public class User {
 	 * @return ブックマークしたイラストの数
 	 */
 	public int getBookmarkSize(){
-		return this.api.getBookmarkSize(this);
+		return this.api.getBookmarkSize(this.getId());
 	}
 
 	/**
@@ -172,7 +171,7 @@ public class User {
 	 * @return 取得したイラストのリスト
 	 */
 	public List<Image> getBookmarks(final int page){
-		return this.api.getBookmarks(this, page);
+		return this.api.getBookmarks(this.getId(), page);
 	}
 
 	//----------------------------------------------------------------------------
